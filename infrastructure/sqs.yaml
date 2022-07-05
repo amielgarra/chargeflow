@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Generate SQS"
+Parameters:
+    ProjectName:
+        Description: "Project name for resource creation"
+        Type: String
+    Stage:
+        Description: "Stage value of project"
+        Type: String
+        AllowedValues: ["dev", "uat", "prod"]
+Resources:
+    AppQueue:
+        Type: AWS::SQS::Queue
+        Properties:
+            QueueName: !Sub "${ProjectName}-${Stage}-sqs"
+Outputs:
+    QueueURL:
+        Description: "URL of new Amazon SQS Queue"
+        Value:
+            Ref: "AppQueue"
+    QueueARN:
+        Description: "ARN of new AmazonSQS Queue"
+        Value:
+            Fn::GetAtt:
+                - "AppQueue"
+                - "Arn"
+    QueueName:
+        Description: "Name of new Amazon SQS Queue"
+        Value:
+            Fn::GetAtt:
+                - "AppQueue"
+                - "QueueName"

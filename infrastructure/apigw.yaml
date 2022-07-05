@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Generate API Gateway infrastructure"
+Parameters:
+    ApiVersion:
+        Description: "Project name for resource creation"
+        Type: String
+        Default: "v1"
+    ProjectName:
+        Description: "Project name for resource creation"
+        Type: String
+    Stage:
+        Description: "Stage value of project"
+        Type: String
+        AllowedValues: ["dev", "uat", "prod"]
+Resources:
+    AppAPIGW:
+        Type: "AWS::ApiGateway::RestApi"
+        Properties:
+            Name: !Sub "${ProjectName}-${Stage}-apigw"
+            MinimumCompressionSize: 0
+            DisableExecuteApiEndpoint: true
+            EndpointConfiguration:
+                Types:
+                    - EDGE
+    AppGwResponse401:
+        Type: "AWS::ApiGateway::GatewayResponse"
+        Properties:
+            ResponseParameters:
+                gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+                gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+            ResponseType: UNAUTHORIZED
+            RestApiId: !Ref AppAPIGW
+            StatusCode: "401"
+    AppGwResponse504:
+        Type: "AWS::ApiGateway::GatewayResponse"
+        Properties:
+            ResponseParameters:
+                gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+                gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+            ResponseType: INTEGRATION_TIMEOUT
+            RestApiId: !Ref AppAPIGW
+            StatusCode: "504"
+Outputs:
+    AppRestAPIId:
+        Value: !Ref AppAPIGW
+        Export:
+            Name: !Sub "${AWS::StackName}:ApiGwRestApiIdExport"
+    AppApiRootResourceId:
+        Value: !GetAtt AppAPIGW.RootResourceId
+        Export:
+            Name: !Sub "${AWS::StackName}:ApiGwRootResourceIdExport"

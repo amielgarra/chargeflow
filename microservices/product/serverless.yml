@@ -1,0 +1,53 @@
+service: product
+
+provider:
+    name: aws
+    runtime: nodejs12.x
+    stage: ${opt:stage, 'dev'}
+    region: ${opt:region, 'us-east-1'}
+    environment:
+        STAGE: ${self:provider.stage}
+        DB_CONNECTION: "mongodb+srv://admin:admin1234@chargeflow.culu1uo.mongodb.net/?retryWrites=true&w=majority"
+    apiGateway:
+        restApiId:
+            "Fn::ImportValue": "pocket-${self:provider.stage}-apigw:ApiGwRestApiIdExport"
+        restApiRootResourceId:
+            "Fn::ImportValue": "pocket-${self:provider.stage}-apigw:ApiGwRootResourceIdExport"
+
+functions:
+    getProducts:
+        handler: getProducts/getProducts.get
+        events:
+            - http:
+                  path: products
+                  method: get
+                  cors: true
+    createOrder:
+        handler: createOrder/createOrder.create
+        events:
+            - http:
+                  path: orders
+                  method: post
+                  cors: true
+    createProduct:
+        handler: createProduct/createProduct.create
+        events:
+            - http:
+                  path: products
+                  method: post
+                  cors: true
+
+package:
+    excludeDevDependencies: false
+    exclude:
+        - serverless.yml
+        - functions.yml
+        - .vscode/**
+        - .idea/**
+        - test/**
+        - package.json
+        - package-lock.json
+        - node_modules/**
+
+plugins:
+    - serverless-offline
