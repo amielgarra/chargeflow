@@ -9,7 +9,7 @@ This is the sequence of the CloudFormation scripts to be run:
 3. API Gateway
 4. SQS
 
-First, you should export variable names:
+In the root folder, you should export variable names:
 
 ```bash
 SET PROJECT_NAME=chargeflow
@@ -28,7 +28,7 @@ Next would be the Managed Policies:
 aws cloudformation create-stack --stack-name %PROJECT_NAME%-%STAGE%-managed-policy --template-body file://infrastructure/managed-policies.yaml --parameters ParameterKey=ProjectName,ParameterValue=%PROJECT_NAME% ParameterKey=Stage,ParameterValue=%STAGE% --capabilities CAPABILITY_IAM --capabilities CAPABILITY_NAMED_IAM
 ```
 
-API Gateway"
+API Gateway:
 
 ```bash
 aws cloudformation create-stack --stack-name %PROJECT_NAME%-%STAGE%-apigw --template-body file://infrastructure/apigw.yaml --parameters ParameterKey=ProjectName,ParameterValue=%PROJECT_NAME% ParameterKey=Stage,ParameterValue=%STAGE%
@@ -52,4 +52,20 @@ To run the application, run:
 
 ```bash
 sls offline
+```
+
+## Running tests
+
+Go to the `microservices/product` folder then run:
+
+```bash
+npm test
+```
+
+## Deploying the project
+
+Go to the `microservices/product` folder then run:
+
+```bash
+sls deploy
 ```
