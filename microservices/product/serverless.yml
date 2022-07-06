@@ -10,9 +10,9 @@ provider:
         DB_CONNECTION: "mongodb+srv://admin:admin1234@chargeflow.culu1uo.mongodb.net/?retryWrites=true&w=majority"
     apiGateway:
         restApiId:
-            "Fn::ImportValue": "pocket-${self:provider.stage}-apigw:ApiGwRestApiIdExport"
+            "Fn::ImportValue": "chargeflow-${self:provider.stage}-apigw:ApiGwRestApiIdExport"
         restApiRootResourceId:
-            "Fn::ImportValue": "pocket-${self:provider.stage}-apigw:ApiGwRootResourceIdExport"
+            "Fn::ImportValue": "chargeflow-${self:provider.stage}-apigw:ApiGwRootResourceIdExport"
 
 functions:
     getProducts:
