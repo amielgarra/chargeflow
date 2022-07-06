@@ -1,34 +1,15 @@
-const sinon = require("sinon");
+var expect = require("chai").expect;
 const { assert } = require("chai");
-const service = require("../lib/services/order");
+const getProducts = require("../getProducts/getProducts");
+const createOrder = require("../createOrder/createOrder");
 const { event } = require("./data/events");
 
-let mock = null;
-let sandbox = null;
-
 describe("Test Order Services", () => {
-    before(() => {
-        sandbox = sinon.createSandbox();
-        mock = setup();
-    });
-
-    after(() => {
-        mock = null;
-        sinon.restore();
-    });
-
     describe("Create Order", () => {
-        it("should insert an order", async () => {
-            const mockService = mock.mockService.service.createOrder;
-            const createOrder = mockService.returns(event.payload.createOrder);
-            const order = createOrder();
-            assert.isNotEmpty(order);
+        it("should create an order", async () => {
+            const result = await createOrder.create(event.payload.createOrder);
+            expect(result.statusCode).to.equal(200);
+            assert.isNotEmpty(result.body);
         });
     });
 });
-
-function setup() {
-    let mockService = { service: {} };
-    mockService.service.createOrder = sandbox.stub(service, "createOrder");
-    return { mockService };
-}

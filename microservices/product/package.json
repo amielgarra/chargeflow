@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "test": "mocha --timeout 100000"
+        "test": "mocha --timeout 100000 --require mocha-suppress-logs"
     },
     "dependencies": {
         "chai": "^4.3.6",
@@ -8,5 +8,8 @@
         "mongoose": "^6.4.2",
         "serverless-offline": "^8.8.0",
         "sinon": "^14.0.0"
+    },
+    "devDependencies": {
+        "mocha-suppress-logs": "^0.3.1"
     }
 }

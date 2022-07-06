@@ -3,6 +3,7 @@ const orderRepository = require("../lib/services/order");
 
 module.exports.create = async (event) => {
     try {
+        console.log(event);
         const data = JSON.parse(event.body);
 
         const order = await orderRepository.createOrder(data);

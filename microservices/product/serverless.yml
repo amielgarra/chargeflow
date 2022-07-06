@@ -22,18 +22,18 @@ functions:
                   path: products
                   method: get
                   cors: true
+    getProduct:
+        handler: getProduct/getProduct.get
+        events:
+            - http:
+                  path: products/{id}
+                  method: get
+                  cors: true
     createOrder:
         handler: createOrder/createOrder.create
         events:
             - http:
                   path: orders
-                  method: post
-                  cors: true
-    createProduct:
-        handler: createProduct/createProduct.create
-        events:
-            - http:
-                  path: products
                   method: post
                   cors: true
 

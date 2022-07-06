@@ -1,0 +1,19 @@
+service: commons
+provider:
+    name: aws
+    runtime: nodejs12.x
+    stage: ${opt:stage, 'dev'}
+    region: ${opt:region, 'us-east-1'}
+
+layers:
+    commons:
+        path: layer
+        compatibleRuntimes:
+            - nodejs12.x
+        name: ${self:service}-${self:provider.stage}-layer
+        retain: false
+resources:
+    Outputs:
+        CommonsLambdaLayerQualifiedArn:
+            Export:
+                Name: !Join [":", [!Ref "AWS::StackName", "CommonsLambdaLayer"]]

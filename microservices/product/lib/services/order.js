@@ -1,6 +1,7 @@
 const { connect } = require("../db/config");
 const { Order } = require("../models/order.model");
 const { sendEmail } = require("./email");
+const product = require("./product");
 
 class OrderRepository {
     constructor() {
@@ -8,11 +9,8 @@ class OrderRepository {
     }
 
     async createOrder(order) {
-        const total = order.products.reduce((sum, product) => {
-            return sum + product.quantity * product.price;
-        }, 0);
+        const total = order.product.quantity * order.product.price;
         order.totalAmount = total;
-        console.log(this.generateOrderEmail(order));
         const result = await Order.create(order);
 
         if (result) {
@@ -28,16 +26,14 @@ class OrderRepository {
         let html = "";
         html += `<h3>You have successfully placed an order. Below is the summary of the order.</h3>`;
         html += `<h3>Order #${order.orderNumber}</h3>`;
-        const tableRows = order.products.map((product) => {
-            return `
+        const tableRow = `
 			<tr>
-				<td>${product.name}</td>
-				<td>${product.price}</td>
-				<td>${product.quantity}</td>
-				<td>${+product.price * +product.quantity}</td>
+				<td>${order.product.name}</td>
+				<td>${order.product.price}</td>
+				<td>${order.product.quantity}</td>
+				<td>${+order.product.price * +order.product.quantity}</td>
 			</tr>
 			`;
-        });
         html += `
 		<table style="width: 50%">
 			<tr>
@@ -46,7 +42,7 @@ class OrderRepository {
 				<th style="text-align: left;">Quantity</th>
 				<th style="text-align: left;">Total</th>
 			</tr>
-			${tableRows.join("")}
+			${tableRow}
 		</table>
 		<h3>Total Amount: ${order.totalAmount}</h3>`;
 

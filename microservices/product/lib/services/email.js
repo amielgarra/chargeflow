@@ -1,5 +1,5 @@
 var aws = require("aws-sdk");
-var ses = new aws.SES();
+var ses = new aws.SES({ region: "us-east-1" });
 
 class EmailService {
     async sendEmail(to, subject, body) {
@@ -22,7 +22,7 @@ class EmailService {
             SourceArn: "arn:aws:ses:us-east-1:108705567938:identity/amiel.garra@outlook.com",
         };
         let key = await ses.sendEmail(params).promise();
-        console.log("MAIL SENT SUCCESSFULLY!!", key);
+        console.log("Email sent successfully.", key);
     }
 }
 

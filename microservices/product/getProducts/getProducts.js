@@ -1,8 +1,7 @@
 const { handleError, handleSuccess } = require("../lib/helpers/response");
 const productRepository = require("../lib/services/product");
-const emailRepository = require("../lib/services/email");
 
-module.exports.get = async (event) => {
+module.exports.get = async () => {
     try {
         const products = await productRepository.getProducts();
 

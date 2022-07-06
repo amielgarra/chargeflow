@@ -1,11 +1,8 @@
 const mongoose = require("mongoose");
 
 const connect = () => {
-    const url = process.env.DB_CONNECTION;
-    mongoose.connect(url, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
+    const url = process.env.DB_CONNECTION || "mongodb+srv://admin:admin1234@chargeflow.culu1uo.mongodb.net/?retryWrites=true&w=majority";
+    mongoose.connect(url);
 
     mongoose.connection.once("open", async () => {
         console.info("Connected to database");

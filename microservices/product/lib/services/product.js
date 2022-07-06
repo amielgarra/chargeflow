@@ -1,6 +1,6 @@
 const { connect } = require("../db/config");
 const { Product } = require("../models/product.model");
-
+const { ObjectId } = require("mongodb");
 class ProductService {
     constructor() {
         connect();
@@ -9,11 +9,15 @@ class ProductService {
     async getProducts() {
         const products = await Product.find({});
         console.log("Products: ", products);
+
         return products;
     }
 
-    async createProduct(product) {
-        return await Product.create(product);
+    async getProduct(id) {
+        const product = await Product.findOne({ _id: new ObjectId(id) });
+        console.log("Product: ", product);
+
+        return product;
     }
 }
 

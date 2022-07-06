@@ -50,24 +50,23 @@ payload.getProducts = [
 ];
 
 payload.createOrder = {
-    orderNumber: "1501",
-    totalAmount: 410,
-    products: [
-        {
-            name: "Product 1",
-            price: 50,
-            quantity: 3,
-        },
-        {
-            name: "Product 2",
-            price: 65,
-            quantity: 4,
-        },
-    ],
-    _id: "62c4658d445d488a31c886b9",
-    createdAt: "2022-07-05T16:23:41.048Z",
-    updatedAt: "2022-07-05T16:23:41.048Z",
-    __v: 0,
+    body:
+        "{\r\n" +
+        '    "orderNumber": 1503,\r\n' +
+        '    "product":\r\n' +
+        "        {\r\n" +
+        '            "name": "Product 1",\r\n' +
+        '            "price": 50,\r\n' +
+        '            "quantity": 3\r\n' +
+        "        },\r\n" +
+        '    "to": "amielvgarra@gmail.com"\r\n' +
+        "}",
+};
+
+payload.getProduct = {
+    pathParameters: {
+        id: "62c446e394ff9b2c91a69f32",
+    },
 };
 
 let event = {};
