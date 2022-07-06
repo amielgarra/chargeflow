@@ -7,7 +7,10 @@
         "mocha": "^10.0.0",
         "mongoose": "^6.4.2",
         "serverless-offline": "^8.8.0",
-        "sinon": "^14.0.0"
+        "sinon": "^14.0.0",
+        "serverless-dotenv-plugin": "^2.4.2",
+        "serverless-latest-layer-version": "^2.1.0",
+        "serverless-pseudo-parameters": "~2.5.0"
     },
     "devDependencies": {
         "mocha-suppress-logs": "^0.3.1"

@@ -17,25 +17,34 @@ provider:
 functions:
     getProducts:
         handler: getProducts/getProducts.get
+        timeout: 10
         events:
             - http:
                   path: products
                   method: get
                   cors: true
+        layers:
+            - ${self:custom.layer}
     getProduct:
         handler: getProduct/getProduct.get
+        timeout: 10
         events:
             - http:
                   path: products/{id}
                   method: get
                   cors: true
+        layers:
+            - ${self:custom.layer}
     createOrder:
         handler: createOrder/createOrder.create
+        timeout: 10
         events:
             - http:
                   path: orders
                   method: post
                   cors: true
+        layers:
+            - ${self:custom.layer}
 
 package:
     excludeDevDependencies: false
@@ -51,3 +60,8 @@ package:
 
 plugins:
     - serverless-offline
+    - serverless-pseudo-parameters
+    - serverless-latest-layer-version
+
+custom:
+    layer: arn:aws:lambda:us-east-1:108705567938:layer:commons-${self:provider.stage}-layer:latest

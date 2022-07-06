@@ -1,0 +1,185 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Default Project VPC configuration"
+Parameters:
+    ProjectName:
+        Description: "Project name for resource creation"
+        Type: String
+    Stage:
+        Description: "Stage value of project"
+        Type: String
+        AllowedValues: ["dev", "uat", "prod"]
+Resources:
+    AppVpc:
+        Type: "AWS::EC2::VPC"
+        Properties:
+            CidrBlock: 192.178.0.0/22
+            Tags:
+                - Key: Name
+                  Value: !Sub "${ProjectName}-${Stage}-vpc"
+    PublicSubnetA:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            VpcId: !Ref AppVpc
+            AvailabilityZone: !Sub "${AWS::Region}a"
+            CidrBlock: 192.178.1.0/24
+            MapPublicIpOnLaunch: true
+            Tags:
+                - Key: Name
+                  Value: !Sub "192.178.1.0 - ${AWS::Region}a"
+    PublicSubnetB:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            VpcId: !Ref AppVpc
+            AvailabilityZone: !Sub "${AWS::Region}b"
+            CidrBlock: 192.178.2.0/24
+            MapPublicIpOnLaunch: true
+            Tags:
+                - Key: Name
+                  Value: !Sub "192.178.2.0 - ${AWS::Region}b"
+    PrivateSubnetC:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            VpcId: !Ref AppVpc
+            AvailabilityZone: !Sub "${AWS::Region}c"
+            CidrBlock: 192.178.3.0/24
+            MapPublicIpOnLaunch: false
+            Tags:
+                - Key: Name
+                  Value: !Sub "192.178.3.0 - ${AWS::Region}c"
+    AppInternetGateway:
+        Type: "AWS::EC2::InternetGateway"
+        Properties:
+            Tags:
+                - Key: Name
+                  Value: !Join [_, [!Ref "AWS::StackName"]]
+    AppAttachGateway:
+        Type: "AWS::EC2::VPCGatewayAttachment"
+        Properties:
+            VpcId: !Ref AppVpc
+            InternetGatewayId: !Ref AppInternetGateway
+    PublicRouteTable:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref AppVpc
+            Tags:
+                - Key: Name
+                  Value: !Sub "${ProjectName}-${Stage}-public-route"
+    PublicRoute:
+        Type: "AWS::EC2::Route"
+        DependsOn: AppAttachGateway
+        Properties:
+            RouteTableId: !Ref PublicRouteTable
+            DestinationCidrBlock: 0.0.0.0/0
+            GatewayId: !Ref AppInternetGateway
+    PublicSubnet1RouteTableAssociation:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            SubnetId: !Ref PublicSubnetA
+            RouteTableId: !Ref PublicRouteTable
+    PublicSubnet2RouteTableAssociation:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            SubnetId: !Ref PublicSubnetB
+            RouteTableId: !Ref PublicRouteTable
+    BastionSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: !Sub "${ProjectName} SSH DMZ"
+            GroupName: !Sub "${ProjectName}-${Stage}-ssh-dmz"
+            VpcId: !Ref AppVpc
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 22
+                  ToPort: 22
+                  CidrIp: 0.0.0.0/0
+            Tags:
+                - Key: Name
+                  Value: !Sub "${ProjectName}-${Stage}-ssh-dmz"
+    WebSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: !Sub "${ProjectName} Web DMZ"
+            GroupName: !Sub "${ProjectName}-${Stage}-web-dmz"
+            VpcId: !Ref AppVpc
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 80
+                  ToPort: 80
+                  CidrIp: 0.0.0.0/0
+                - IpProtocol: tcp
+                  FromPort: 443
+                  ToPort: 443
+                  CidrIp: 0.0.0.0/0
+            Tags:
+                - Key: Name
+                  Value: !Sub "${ProjectName}-${Stage}-web-dmz"
+    DBSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: !Sub "${ProjectName} DB DMZ"
+            GroupName: !Sub "${ProjectName}-${Stage}-db-dmz"
+            VpcId: !Ref AppVpc
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 22
+                  ToPort: 22
+                  CidrIp: 0.0.0.0/0
+                - IpProtocol: tcp
+                  FromPort: 5432
+                  ToPort: 5432
+                  SourceSecurityGroupId:
+                      Ref: BastionSecurityGroup
+            Tags:
+                - Key: Name
+                  Value: !Sub "${ProjectName}-${Stage}-db-dmz"
+Outputs:
+    PublicSubnetA:
+        Value: !Ref PublicSubnetA
+        Description: DB Security export name
+        Export:
+            Name: !Join
+                - ":"
+                - - !Ref "AWS::StackName"
+                  - PublicSubnetA
+    PublicSubnetB:
+        Value: !Ref PublicSubnetA
+        Description: DB Security export name
+        Export:
+            Name: !Join
+                - ":"
+                - - !Ref "AWS::StackName"
+                  - PublicSubnetB
+    PublicSubnetC:
+        Value: !Ref PublicSubnetA
+        Description: DB Security export name
+        Export:
+            Name: !Join
+                - ":"
+                - - !Ref "AWS::StackName"
+                  - PrivateSubnetC
+    WebServerSecurityGroup:
+        Description: The security group ID to use for public web servers
+        Value:
+            Fn::GetAtt:
+                - WebSecurityGroup
+                - GroupId
+        Export:
+            Name:
+                Fn::Sub: "${AWS::StackName}:WebSecurityGroupId"
+    BastionSecurityGroup:
+        Description: The security group ID to use for public web servers
+        Value:
+            Fn::GetAtt:
+                - BastionSecurityGroup
+                - GroupId
+        Export:
+            Name:
+                Fn::Sub: "${AWS::StackName}:BastionSecurityGroupId"
+    DBSecurityGroupId:
+        Value: !Ref WebSecurityGroup
+        Description: DB Security export name
+        Export:
+            Name: !Join
+                - ":"
+                - - !Ref "AWS::StackName"
+                  - DBSecurityGroupId
