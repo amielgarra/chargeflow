@@ -17,29 +17,10 @@ Resources:
         Type: "AWS::ApiGateway::RestApi"
         Properties:
             Name: !Sub "${ProjectName}-${Stage}-apigw"
-            MinimumCompressionSize: 0
-            DisableExecuteApiEndpoint: true
+            ApiKeySourceType: "HEADER"
             EndpointConfiguration:
                 Types:
-                    - EDGE
-    AppGwResponse401:
-        Type: "AWS::ApiGateway::GatewayResponse"
-        Properties:
-            ResponseParameters:
-                gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-                gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
-            ResponseType: UNAUTHORIZED
-            RestApiId: !Ref AppAPIGW
-            StatusCode: "401"
-    AppGwResponse504:
-        Type: "AWS::ApiGateway::GatewayResponse"
-        Properties:
-            ResponseParameters:
-                gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-                gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
-            ResponseType: INTEGRATION_TIMEOUT
-            RestApiId: !Ref AppAPIGW
-            StatusCode: "504"
+                    - "EDGE"
 Outputs:
     AppRestAPIId:
         Value: !Ref AppAPIGW

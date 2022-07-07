@@ -1,4 +1,4 @@
-service: product
+service: chargeflow-product
 
 provider:
     name: aws
@@ -23,6 +23,7 @@ functions:
                   path: products
                   method: get
                   cors: true
+                  private: false
         layers:
             - ${self:custom.layer}
     getProduct:
@@ -33,6 +34,7 @@ functions:
                   path: products/{id}
                   method: get
                   cors: true
+                  private: false
         layers:
             - ${self:custom.layer}
     createOrder:
@@ -43,6 +45,7 @@ functions:
                   path: orders
                   method: post
                   cors: true
+                  private: false
         layers:
             - ${self:custom.layer}
 
